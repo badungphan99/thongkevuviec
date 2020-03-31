@@ -45,3 +45,7 @@ def delete_incident(id):
         return True
     else:
         return False
+
+def get_all_incident():
+    incidents = session.query(Incident).all()
+    return incidents
