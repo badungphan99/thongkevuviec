@@ -1,7 +1,7 @@
 import datetime
 
 from app.model import *
-from app import db, session
+from app import session
 
 def insert_incident(location, result, reason, solution, fields):
     time = datetime.datetime.now()
