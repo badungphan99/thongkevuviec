@@ -1,5 +1,6 @@
-from sqlalchemy import create_engine
+import sqlalchemy as db
+from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('sqlite:///dungpb.sqlite')
-
-connecrtion = engine.connect()
+engine = db.create_engine('sqlite:///../Database/dungpb.db', echo = False)
+Session = sessionmaker(bind=engine)
+session = Session()

@@ -1,0 +1,1 @@
+from app.model.Incident import Incident, Base

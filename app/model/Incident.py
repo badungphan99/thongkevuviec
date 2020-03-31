@@ -1,9 +1,7 @@
-from sqlalchemy import create_engine
-from sqlalchemy.schema import Column, ForeignKey
+from sqlalchemy.schema import Column
 from sqlalchemy.types import Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('sqlite:///dungpb.db', echo = True)
 Base = declarative_base()
 
 class Incident(Base):
@@ -14,14 +12,12 @@ class Incident(Base):
     result = Column(String)
     reason = Column(String)
     solution = Column(String)
-    fileds = Column(String)
+    fields = Column(String)
 
-    def __init__(self, time, location, result, reason, solution, fileds):
+    def __init__(self, time, location, result, reason, solution, fields):
         self.time = time
         self.location = location
         self.result = result
         self.reason = reason
         self.solution = solution
-        self.fileds = fileds
-
-Base.metadata.create_all(engine)
+        self.fields = fields
