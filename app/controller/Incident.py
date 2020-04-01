@@ -3,9 +3,9 @@ import datetime
 from app.model import *
 from app import session
 
-def insert_incident(location, result, reason, solution, fields):
-    time = datetime.datetime.now()
-    incident1 = Incident(time, location, result, reason, solution, fields)
+def insert_incident(time, location, result, reason, solution, fields):
+    time_modify = datetime.datetime.now()
+    incident1 = Incident(time, location, result, reason, solution, fields, time_modify)
     session.add(incident1)
     session.commit()
 
@@ -15,7 +15,10 @@ def check_incident(id):
     return exists != None
 
 def get_incident_field(field):
-    incidents = session.query(Incident).filter_by(fields = field).all()
+    if(field == ""):
+        incidents = session.query(Incident).all()
+    else:
+        incidents = session.query(Incident).filter_by(fields = field).all()
     session.commit()
     return incidents
 
@@ -24,14 +27,16 @@ def get_incident_id(id):
     session.commit()
     return incident
 
-def update_incident(id, location, result, reason, solution, fields):
+def update_incident(id, time, location, result, reason, solution, fields):
     if(check_incident(id)):
         incident = session.query(Incident).filter_by(id= id).one()
+        incident.time = time
         incident.location = location
         incident.result = result
         incident.reason = reason
         incident.solution = solution
         incident.fields = fields
+        incident.time_modify = datetime.datetime.now()
         session.commit()
         return True
     else:

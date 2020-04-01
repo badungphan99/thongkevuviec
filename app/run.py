@@ -1,7 +1,6 @@
 from app import *
 from app.model import *
-from app.controller.Incident import insert_incident, check_incident, update_incident, get_incident_field, get_incident_id, delete_incident
-from app.controller.Export import *
+from app.controller import *
 from app.View.MainWindows import *
 
 def migrate_db():
@@ -46,6 +45,7 @@ def migrate_db():
 
 # export()
 if __name__ == "__main__" :
+    migrate_db()
     app = QApplication(sys.argv)
 
     window = MainWindow()
@@ -53,3 +53,4 @@ if __name__ == "__main__" :
 
     app.exec_()
     # migrate_db()
+    # export()

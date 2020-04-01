@@ -1,10 +1,11 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QToolBar, QStatusBar, QAction, QVBoxLayout, QWidget, QSplitter, \
     QFrame, QComboBox, QGridLayout, QTableWidget, QListWidget, QTableWidgetItem, QPushButton, QGroupBox, QFormLayout, QLineEdit, \
-    QSpinBox, QHBoxLayout, QPlainTextEdit, QPlainTextDocumentLayout
+    QSpinBox, QHBoxLayout, QPlainTextEdit, QPlainTextDocumentLayout, QDialog, QMessageBox
 from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
 from app.controller import *
+from app.View.ExportWindows import ExportWindows
 
 # Subclass QMainWindow to customise your application's main window
 class MainWindow(QMainWindow):
@@ -29,7 +30,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
 
     def top_graph(self):
-        self.top = QGroupBox("Nhap cac thong tin")
+        self.top = QGroupBox("Nhập các thông tin")
         top_layout = QVBoxLayout()
 
         # Button
@@ -39,7 +40,11 @@ class MainWindow(QMainWindow):
         cancel_button = QPushButton("Cancel")
         cancel_button.clicked.connect(self.cancel_click)
 
+        search_button = QPushButton("Search")
+        search_button.clicked.connect(self.search_click)
+
         button_layout = QHBoxLayout()
+        button_layout.addWidget(search_button)
         button_layout.addWidget(save_button)
         button_layout.addWidget(cancel_button)
 
@@ -49,8 +54,9 @@ class MainWindow(QMainWindow):
 
         self.line_edit_thoi_gian = QLineEdit()
         self.line_edit_dia_diem = QLineEdit()
+        self.line_edit_linh_vuc = QLineEdit()
 
-        combobox_linh_vuc = QComboBox()
+        # combobox_linh_vuc = QComboBox()
 
         container_time = QWidget()
         form_thoi_gian_layout = QHBoxLayout()
@@ -67,7 +73,7 @@ class MainWindow(QMainWindow):
         container_field = QWidget()
         form_linh_vuc_layout = QHBoxLayout()
         form_linh_vuc_layout.addWidget(QLabel("Lĩnh Vực: "))
-        form_linh_vuc_layout.addWidget(combobox_linh_vuc)
+        form_linh_vuc_layout.addWidget(self.line_edit_linh_vuc)
         container_field.setLayout(form_linh_vuc_layout)
 
         form_top_layout.addWidget(container_time, 1, 0)
@@ -88,11 +94,11 @@ class MainWindow(QMainWindow):
         self.plan_text_solution = QPlainTextEdit()
 
         form_layout.addRow(form_top_layout)
-        form_layout.addRow(QLabel("Nguyen nhan"))
+        form_layout.addRow(QLabel("Nguyên "))
         form_layout.addRow(self.plan_text_reason)
-        form_layout.addRow(QLabel("Hau qua"))
+        form_layout.addRow(QLabel("Hậu quả"))
         form_layout.addRow(self.plan_text_result)
-        form_layout.addRow(QLabel("Bien phap ket qua xu ly"))
+        form_layout.addRow(QLabel("Biện pháp xử lý"))
         form_layout.addRow(self.plan_text_solution)
 
         top_layout.addLayout(form_layout)
@@ -106,7 +112,7 @@ class MainWindow(QMainWindow):
 
         table_data = QTableWidget()
 
-        headers = ["id", "time", "location", "result", "reason", "solution", "fields", "time modify"]
+        headers = ["Id", "Thời gian", "Địa điểm", "Kết quả", "Lý do", "Giải pháp", "Lĩnh vực", "Thời gian chỉnh sửa"]
         incidents = get_all_incident()
 
         table_data.setColumnCount(len(headers))
@@ -129,22 +135,58 @@ class MainWindow(QMainWindow):
     def save_click(self):
         time = self.line_edit_thoi_gian.text()
         location = self.line_edit_dia_diem.text()
-        fields = "5"
+        fields = self.line_edit_linh_vuc.text()
         reason = self.plan_text_reason.toPlainText()
         result = self.plan_text_result.toPlainText()
         solution = self.plan_text_solution.toPlainText()
 
         if(time == "" or location == "" or fields == "" or reason == "" or result == "" or solution == ""):
-            print("chuwa nhap du thong tin")
+            print("chua nhap du thong tin")
+            self.dialog_missing_input()
         else:
-            insert_incident(location, result, reason, solution, fields)
+            insert_incident(time, location, result, reason, solution, fields)
             self.bottom_graph()
             self.main_layout.addWidget(self.bottom, 2, 0)
             self.cancel_click()
 
+    def save_missing_info(self):
+        time = self.line_edit_thoi_gian.text()
+        location = self.line_edit_dia_diem.text()
+        fields = self.line_edit_linh_vuc.text()
+        reason = self.plan_text_reason.toPlainText()
+        result = self.plan_text_result.toPlainText()
+        solution = self.plan_text_solution.toPlainText()
+
+        insert_incident(time, location, result, reason, solution, fields)
+        self.bottom_graph()
+        self.main_layout.addWidget(self.bottom, 2, 0)
+        self.cancel_click()
+
     def cancel_click(self):
         self.line_edit_thoi_gian.setText("")
         self.line_edit_dia_diem.setText("")
+        self.line_edit_linh_vuc.setText("")
         self.plan_text_reason.setPlainText("")
         self.plan_text_result.setPlainText("")
         self.plan_text_solution.setPlainText("")
+
+    def dialog_missing_input(self):
+        print("tao da chay den day")
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+
+        msg.setText("Bạn đang nhập thiếu một trường thông tin nào đấy")
+        msg.setInformativeText("Bạn có muốn tiếp tục khi vẫn bị thiếu thông tin")
+        msg.setWindowTitle("Lỗi !!!")
+        msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        msg.buttonClicked.connect(self.msgbtn)
+        retval = msg.exec_()
+
+    def msgbtn(self, i):
+        print("Button pressed is:", i.text())
+        if(i.text() == "&OK"):
+            self.save_missing_info()
+
+    def search_click(self):
+        dialog = ExportWindows(self)
+        dialog.show()
