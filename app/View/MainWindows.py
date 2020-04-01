@@ -141,7 +141,6 @@ class MainWindow(QMainWindow):
         solution = self.plan_text_solution.toPlainText()
 
         if(time == "" or location == "" or fields == "" or reason == "" or result == "" or solution == ""):
-            print("chua nhap du thong tin")
             self.dialog_missing_input()
         else:
             insert_incident(time, location, result, reason, solution, fields)
@@ -171,7 +170,6 @@ class MainWindow(QMainWindow):
         self.plan_text_solution.setPlainText("")
 
     def dialog_missing_input(self):
-        print("tao da chay den day")
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
 
@@ -183,7 +181,6 @@ class MainWindow(QMainWindow):
         retval = msg.exec_()
 
     def msgbtn(self, i):
-        print("Button pressed is:", i.text())
         if(i.text() == "&OK"):
             self.save_missing_info()
 
